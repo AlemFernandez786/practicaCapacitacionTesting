@@ -3,6 +3,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.Generic;
 using ExpectedConditions = SeleniumExtras.WaitHelpers.ExpectedConditions;
 
 namespace capacitacion
@@ -23,7 +24,7 @@ namespace capacitacion
             driver.Navigate().GoToUrl("https:\\www.google.com");
 
             string title = driver.Title;
-           
+
             driver.Navigate().GoToUrl("https:\\www.facebook.com");
 
             driver.Navigate().Back();
@@ -73,6 +74,50 @@ namespace capacitacion
             string interesDevuelto = driver.FindElement(By.Id("interest")).Text;
 
             Assert.AreEqual("1200", interesDevuelto);
+        }
+
+        [Test]
+        public void Extra()
+        {
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/interes.html");
+
+            driver.FindElement(By.ClassName("button")).Click();
+
+            List<string> errores = new List<string>();
+
+            IWebElement monto = driver.FindElement(By.Name("amount"));
+            if (!Convert.ToBoolean(monto.GetAttribute("required")))
+            {
+                errores.Add("El campo mount no es obligatorio");
+            }
+
+            IWebElement rate = driver.FindElement(By.Name("rate"));
+            if (!Convert.ToBoolean(rate.GetAttribute("required")))
+            {
+                errores.Add("El campo rate no es obligatorio");
+            }
+
+            IWebElement time = driver.FindElement(By.Name("time"));
+            if (!Convert.ToBoolean(time.GetAttribute("required")))
+            {
+                errores.Add("El campo time no es obligatorio");
+            }
+
+            IWebElement time_units = driver.FindElement(By.Name("time_units"));
+            if (!Convert.ToBoolean(time_units.GetAttribute("required")))
+            {
+                errores.Add("El campo time_units no es obligatorio");
+            }
+
+
+            int conteoErrores = errores.Count;
+
+            if (conteoErrores != 0)
+            {
+                errores.ForEach(Console.WriteLine);
+                Assert.IsTrue(false);
+            }
+
         }
 
         [Test]
