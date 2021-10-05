@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
@@ -21,11 +22,11 @@ namespace capacitacion
         [Test]
         public void Test1()
         {
-            driver.Navigate().GoToUrl("https:\\www.google.com");
+            driver.Navigate().GoToUrl("https://www.google.com");
 
             string title = driver.Title;
 
-            driver.Navigate().GoToUrl("https:\\www.facebook.com");
+            driver.Navigate().GoToUrl("https://www.facebook.com");
 
             driver.Navigate().Back();
 
@@ -36,7 +37,7 @@ namespace capacitacion
         [Test]
         public void Test2()
         {
-            driver.Navigate().GoToUrl("https:\\icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/basic.htm");
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/basic.htm");
 
             IWebElement element = driver.FindElement(By.XPath("/html/body/section/p[4]"));
 
@@ -123,7 +124,7 @@ namespace capacitacion
         [Test]
         public void Test4()
         {
-            driver.Navigate().GoToUrl("https:\\icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/alerts.html");
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/alerts.html");
 
             IWebElement element = driver.FindElement(By.Id("show-prompt"));
             element.Click();
@@ -144,7 +145,7 @@ namespace capacitacion
         [Test]
         public void Extra1()
         {
-            driver.Navigate().GoToUrl("https:\\icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/alerts.html");
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/alerts.html");
 
             IWebElement element = driver.FindElement(By.Id("show-alert"));
             element.Click();
@@ -162,7 +163,7 @@ namespace capacitacion
         [Test]
         public void Extra2()
         {
-            driver.Navigate().GoToUrl("https:\\icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/alerts.html");
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/alerts.html");
 
             IWebElement element = driver.FindElement(By.Id("show-confirm"));
             element.Click();
@@ -180,7 +181,7 @@ namespace capacitacion
         [Test]
         public void Test5()
         {
-            driver.Navigate().GoToUrl("https:\\icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/ajax.html");
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/ajax.html");
 
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
@@ -204,7 +205,7 @@ namespace capacitacion
         public void Test6()
         {
 
-            driver.Navigate().GoToUrl("https:\\icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/basic.htm");
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/basic.htm");
 
             string ventanaAutomatizacion = driver.Title;
 
@@ -218,6 +219,8 @@ namespace capacitacion
 
             Assert.AreNotEqual(ventanaAutomatizacion, ventanaActual);
 
+            driver.Close();// Si no se cierra la ventana a la que dirige "Enlace 2" falla la prueba Test7_Extra2 al ejecutar todas las pruebas a la vez
+
             driver.SwitchTo().Window(ventanas[0]);
 
             ventanaActual = driver.Title;
@@ -226,12 +229,114 @@ namespace capacitacion
 
         }
 
+        [Test]
+        public void Test7()
+        {
+
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/frames/index.html");
+            driver.SwitchTo().Frame("menu");
+
+            IWebElement link = driver.FindElement(By.LinkText("White Page"));
+            link.Click();
+
+            driver.SwitchTo().DefaultContent();
+
+            driver.SwitchTo().Frame("content");
+
+            string titulo = driver.FindElement(By.TagName("h1")).Text;
+
+            Assert.AreEqual("White Page", titulo);
+        }
+
+        [Test]
+        public void Test7_Extra1()
+        {
+
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/frames/index.html");
+            driver.SwitchTo().Frame("content");
+
+            IWebElement link = driver.FindElement(By.XPath("//ul[1]/li[1]/a"));
+            link.Click();
+
+            driver.SwitchTo().DefaultContent();
+
+            driver.SwitchTo().Frame("content");
+
+            IWebElement linkBack = driver.FindElement(By.LinkText("Back to original page"));
+            linkBack.Click();
+
+            driver.SwitchTo().DefaultContent();
+
+        }
+
+        [Test]
+        public void Test7_Extra2()
+        {
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/frames/index.html");
+            driver.SwitchTo().Frame("content");
+
+            IWebElement link = driver.FindElement(By.XPath("//ul[3]/li[1]/a"));
+            link.Click();
+
+            var ventanas = driver.WindowHandles;
+
+            driver.SwitchTo().Window(ventanas[1]);
+
+            IWebElement linkBack = driver.FindElement(By.LinkText("Back to original page"));
+            linkBack.Click();
+
+            driver.SwitchTo().Window(ventanas[0]);
+
+            driver.SwitchTo().DefaultContent();
+
+        }
+
+        [Test]
+        public void Test7a()
+        {
+
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/drag_and_drop.html");
+
+            IWebElement amarillo = driver.FindElement(By.Id("draggable"));
+
+            IWebElement verde = driver.FindElement(By.Id("droppable"));
+
+            Actions dragAndDrop = new Actions(driver);
+
+            dragAndDrop.DragAndDrop(amarillo, verde).Perform();
+
+            Assert.AreEqual(verde.Text, "Dropped");
+        }
+
+        [Test]
+        public void Test8()
+        {
+
+            driver.Navigate().GoToUrl("https://icy-dune-0d3ed7d0f.azurestaticapps.net/selenium/selectable.html");
+
+            IWebElement numero2 = driver.FindElement(By.XPath("//*[@id='selectable']/li[2]"));
+
+            IWebElement numero3 = driver.FindElement(By.XPath("//*[@id='selectable']/li[3]"));
+
+            IWebElement numero4 = driver.FindElement(By.XPath("//*[@id='selectable']/li[4]"));
+
+            Actions multipleSelect = new Actions(driver);
+
+            multipleSelect.KeyDown(Keys.Control).Click(numero2).Click(numero3).Click(numero4).KeyUp(Keys.Control).Perform();
+
+            string resultado = driver.FindElement(By.Id("select-result")).Text;
+
+            Assert.AreEqual(resultado, "#2 #3 #4");
+        }
+
+
+
 
         [TearDown]
         public void TearDown()
         {
 
-            //Si dejo esta sentencia ejecutable o driver.Quit(); hace el primer test y luego tira error
+            //Si dejo esta sentencia ejecutable o driver.Quit(); hace el primer test y luego tira error de conexión
 
             //driver.Close();
         }
